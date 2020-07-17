@@ -103,3 +103,104 @@ z.backward()
 print('Analytical grad g(w)', grad_g(w))
 print('PyTorch\'s grad g(w)', w.grad)
 print()
+
+
+#################使用梯度##################
+
+x = torch.tensor([5.0],requires_grad=True)
+step_size = 0.25
+print('iter,\tx,\tf(x),\tf\'(x),\tf\'(x) pytorch')
+for i in range(15):
+    y = f(x) # y = (x-2)^2
+    y.backward()
+    print('{},\t{:.3f},\t{:.3f},\t{:.3f},\t{:.3f}'.
+          format(i, x.item(), f(x).item(), fp(x).item(), x.grad.item()))
+    x.data -= step_size * x.grad
+
+    #使用后将变量的梯度归零，因为backward()的结果是累加而不是覆盖
+    x.grad.detach_()
+    x.grad.zero_()
+
+
+#################线性回归##################
+# 构造一个带有噪声的数据集
+d = 2
+n = 50
+X = torch.randn(n,d)
+true_w = torch.tensor([[-1.0],[2.0]])
+y = X.mm(true_w) + torch.randn(n,1) * 0.1 # 与使用X @ true_w相同
+print('X shape', X.shape)
+print('y shape', y.shape)
+print('w shape', true_w.shape)
+
+# 数据集可视化
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+ax.scatter(X[:,0].numpy(), X[:,1].numpy(), y.numpy(), c='r', marker='o')
+ax.set_xlabel('$X_1$')
+ax.set_ylabel('$X_2$')
+ax.set_zlabel('$Y$')
+
+plt.title('Dataset')
+plt.show()
+
+# 合理性验证
+def model(X, w):
+    return X @ w
+
+# the residual sum of squares loss function
+def rss(y, y_hat):
+    return torch.norm(y - y_hat)**2 / n
+
+# analytical expression for the gradient
+def grad_rss(X, y, w):
+    return -2*X.t() @ (y - X @ w) / n
+
+w = torch.tensor([[1.], [0]], requires_grad=True)
+y_hat = model(X, w)
+
+loss = rss(y, y_hat)
+loss.backward()
+
+print('Analytical gradient', grad_rss(X, y, w).detach().view(2).numpy())
+print('PyTorch\'s gradient', w.grad.view(2).numpy())
+
+
+#################使用梯度下降的线性回归##################
+step_size = 0.1
+print('iter,\tloss,\tw')
+for i in range(20):
+    y_hat = model(X,w)
+    loss = rss(y,y_hat)
+    loss.backward()
+    w.data -= step_size * w.grad
+    print('{},\t{:.2f},\t{}'.format(i, loss.item(), w.view(2).detach().numpy()))
+
+    w.grad.detach_()
+    w.grad.zero_()
+print('\ntrue w\t\t', true_w.view(2).numpy())
+print('estimated w\t', w.view(2).detach().numpy())
+
+# 可视化
+def visualize_fun(w, title, num_pts=20):
+    x1, x2 = np.meshgrid(np.linspace(-2, 2, num_pts), np.linspace(-2, 2, num_pts))
+    X_plane = torch.tensor(np.stack([np.reshape(x1, (num_pts ** 2)), np.reshape(x2, (num_pts ** 2))], axis=1)).float()
+    y_plane = np.reshape((X_plane @ w).detach().numpy(), (num_pts, num_pts))
+
+    plt3d = plt.figure().gca(projection='3d')
+    plt3d.plot_surface(x1, x2, y_plane, alpha=0.2)
+
+    ax = plt.gca()
+    ax.scatter(X[:, 0].numpy(), X[:, 1].numpy(), y.numpy(), c='r', marker='o')
+
+    ax.set_xlabel('$X_1$')
+    ax.set_ylabel('$X_2$')
+    ax.set_zlabel('$Y$')
+
+    plt.title(title)
+    plt.show()
+
+visualize_fun(true_w, 'Dataset and true $w$')
+
+
+#################torch.nn##################
