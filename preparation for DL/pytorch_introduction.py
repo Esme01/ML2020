@@ -204,3 +204,133 @@ visualize_fun(true_w, 'Dataset and true $w$')
 
 
 #################torch.nn##################
+'''
+Module是pytorch对tensor进行操作的一种方式
+Module作为torch.nn.Module的子类实现
+所有的Module都是可调用的，并且可以组合在一起创造复杂的函数
+'''
+# Linear Module
+'''
+Linear Module是所有Module的基础，进行带bias的线性变换
+以输入和输出的维度作为参数
+在对象内部自动创建并随机初始化weights
+(pytorch在torch.nn.init实现了常见的初始化)
+https://pytorch.org/docs/stable/nn.html#torch-nn-init
+'''
+dim_in = 3
+dim_out = 4
+linear_module = nn.Linear(dim_in,dim_out)
+example_tensor = torch.tensor([[1.,2,3],[4,5,6]])
+transformed = linear_module(example_tensor)
+print('example_tensor', example_tensor.shape)
+print('transormed', transformed.shape)
+print()
+print('We can see that the weights exist in the background\n')
+print('W:', linear_module.weight)
+print('b:', linear_module.bias)
+print()
+
+# 激活函数
+'''
+pytorch实现了ReLU,Tanh,Sigmoid等激活函数
+激活函数以module的形式实现，使用时需要实例化
+'''
+activation_fn = nn.ReLU()
+example_tensor = torch.tensor([-1.0,1.0,0.0])
+activated = activation_fn(example_tensor)
+print('example_tensor', example_tensor)
+print('activated', activated)
+print()
+
+# 使用Sequential组合简单Module
+dim_in = 3
+dim_hidden = 4
+dim_out = 1
+model = torch.nn.Sequential(
+    nn.Linear(dim_in,dim_hidden),
+    nn.Tanh(),
+    nn.Linear(dim_hidden,dim_out),
+    nn.Sigmoid()
+)
+example_tensor = torch.tensor([[1.,2,3],[4,5,6]])
+transformed = model(example_tensor)
+print('transformed', transformed.shape)
+print()
+
+# 通过parameters()访问Module的所有参数
+params = model.parameters()
+for param in params:
+    print(param)
+print()
+
+# 损失函数
+# pytorch实现了包括MSE，CrossEntropy在内的常见损失函数
+mse_loss_fn = nn.MSELoss()
+input = torch.tensor([[0., 0, 0]])
+target = torch.tensor([[1., 0, -1]])
+loss = mse_loss_fn(input, target)
+print(loss)
+print()
+
+################# torch.optim ##################
+'''
+pytorch在torch.optim中实现了包括梯度下降在内的一系列基于梯度的最优化方法
+各种方法接受的参数为模型的参数和学习率
+optimizer不计算梯度，所以要手动调用backward()，同时也要注意梯度的清零
+'''
+model = nn.Linear(1,1)
+X_simple = torch.tensor([[1.]])
+y_simple = torch.tensor([[2.]])
+# 实例化optimizer
+optim = torch.optim.SGD(model.parameters(),lr=1e-2)
+mse_loss_fn = nn.MSELoss()
+y_hat = model(X_simple)
+print('model params before:', model.weight)
+loss = mse_loss_fn(y_hat,y_simple)
+loss.backward()
+optim.step()
+optim.zero_grad()
+# 从输出结果可以看出参数向正确的方向更新
+print('model params after:', model.weight)
+print()
+
+# 使用自动计算偏导的梯度下降和pytorch Modules实现线性回归
+step_size = 0.1
+linear_module = nn.Linear(d, 1, bias=False)
+loss_func = nn.MSELoss()
+optim = torch.optim.SGD(linear_module.parameters(), lr=step_size)
+print('iter,\tloss,\tw')
+
+for i in range(20):
+    y_hat = linear_module(X)
+    loss = loss_func(y_hat, y)
+    optim.zero_grad()
+    loss.backward()
+    optim.step()
+    print('{},\t{:.2f},\t{}'.format(i, loss.item(), linear_module.weight.view(2).detach().numpy()))
+
+print('\ntrue w\t\t', true_w.view(2).numpy())
+print('estimated w\t', linear_module.weight.view(2).detach().numpy())
+print()
+
+# 使用随机梯度下降的线性回归
+step_size = 0.01
+
+linear_module = nn.Linear(d, 1)
+loss_func = nn.MSELoss()
+optim = torch.optim.SGD(linear_module.parameters(), lr=step_size)
+print('iter,\tloss,\tw')
+for i in range(200):
+    rand_idx = np.random.choice(n)  #数据集中随机选取一个样本
+    x = X[rand_idx]
+    y_hat = linear_module(x)
+    loss = loss_func(y_hat, y[rand_idx])  #只计算该样本的loss
+    optim.zero_grad()
+    loss.backward()
+    optim.step()
+
+    if i % 20 == 0:
+        print('{},\t{:.2f},\t{}'.format(i, loss.item(), linear_module.weight.view(2).detach().numpy()))
+
+print('\ntrue w\t\t', true_w.view(2).numpy())
+print('estimated w\t', linear_module.weight.view(2).detach().numpy())
