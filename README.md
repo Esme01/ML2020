@@ -11,4 +11,5 @@
 
 ### Notes
 
-1[Introduction to GAN](https://github.com/xh-1ceee/ML2020/blob/master/GAN Notes/Introduction to GAN.pdf)
+[1.Introduction to GAN](https://github.com/xh-1ceee/ML2020/blob/master/GAN Notes/Introduction to GAN.pdf)
+
