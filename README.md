@@ -6,3 +6,7 @@
 ## Preparation for DL
 
 ## HW3:Food Classification(CNN)
+
+## GAN Notes
+
+1.Introduction to GAN:
