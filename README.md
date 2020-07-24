@@ -7,6 +7,8 @@
 
 ## HW3:Food Classification(CNN)
 
-## GAN Notes
+## GAN
 
-1.Introduction to GAN:
+### Notes
+
+1[Introduction to GAN](https://github.com/xh-1ceee/ML2020/blob/master/GAN Notes/Introduction to GAN.md)
