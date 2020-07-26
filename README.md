@@ -11,7 +11,9 @@
 
 ### Notes
 
-[1.Introduction to GAN](https://github.com/xh-1ceee/ML2020/blob/master/GAN%20Notes/Introduction%20to%20GAN.pdf)  
+[1.Introduction to GAN](https://github.com/xh-1ceee/ML2020/blob/master/GAN%20Notes/Introduction%20to%20GAN.pdf)    
+[2.Conditional GAN](https://github.com/xh-1ceee/ML2020/blob/master/GAN%20Notes/Conditional%20Generation.pdf)    
+
 
 
 
