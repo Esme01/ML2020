@@ -13,7 +13,7 @@
 
 [1.Introduction to GAN](https://github.com/xh-1ceee/ML2020/blob/master/GAN%20Notes/Introduction%20to%20GAN.pdf)    
 [2.Conditional GAN](https://github.com/xh-1ceee/ML2020/blob/master/GAN%20Notes/Conditional%20Generation.pdf)    
-
+[3.Unsupervised Conditional Generation](https://github.com/xh-1ceee/ML2020/blob/master/GAN%20Notes/Unsupervised%20Conditional%20Generation.pdf)   
 
 
 
